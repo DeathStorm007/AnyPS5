@@ -39,6 +39,13 @@ build-fuzz/tests/relinker_conversion_fuzzer build-fuzz/fuzz-corpus -fork=2 -max_
 git submodule update --init --recursive
 ```
 
+If this command is interrupted while a submodule is being cloned, running it again can leave that submodule's directory empty while Git counts it as initialized. Configuration then fails with `The source directory .../3rdparty/<name> does not contain a CMakeLists.txt file`, followed by errors about targets it should have defined, such as `Can not find target to add properties to: fvad`. Clone the submodule again:
+
+```sh
+git submodule deinit -f -- 3rdparty/<name>
+git submodule update --init --recursive --force -- 3rdparty/<name>
+```
+
 ## Selective test builds
 
 [`tools/select_tests.py`](../../tools/select_tests.py) selects the tests whose build inputs a change touches, so a pull request can build and run only those tests. Configure and build a full tree with `-DBUILD_TESTING=ON` (`dump` needs the header dependencies that only exist once the objects are built), then:
